@@ -1,0 +1,15 @@
+port: "3000"
+
+db:
+  username: "postgres"
+  host: "localhost"
+  port: "5432"
+  dbname: "postgres"
+  sslmode: "disable"
+
+postgres:
+  usersTable: "users"
+  todoListsTable: "todo_lists"
+  usersListsTable: "users_lists"
+  todoItemsTable: "todo_items"
+  listsItemsTable: "lists_items"
