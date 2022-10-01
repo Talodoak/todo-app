@@ -1,4 +1,4 @@
-FROM golang:1.14-buster
+FROM golang
 
 RUN go version
 ENV GOPATH=/
@@ -14,6 +14,6 @@ RUN chmod +x ./scripts/wait-for-postgres.sh
 
 # build go app
 RUN go mod download
-RUN go build -o todo-app ./cmd/app/main.go
+RUN go build -o todo-app ./cmd/api/main.go
 
 CMD ["./todo-app"]
