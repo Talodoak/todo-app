@@ -3,20 +3,48 @@ version: '3.8'
 services:
   todo-app:
     build: ./
-    command: ./scripts/wait-for-postgres.sh db ./todo-app
+    command: ./scripts/wait-for-postgres.sh todo-app-postgres ./todo-app
     ports:
       - 8000:8000
     depends_on:
-      - db
+      - todo-app-postgres
+    networks:
+      todo-app.net:
     environment:
       - DB_PASSWORD=qwerty
 
-  db:
+  todo-app-postgres:
+    hostname: todo-app-postgres
     restart: always
     image: postgres:latest
     volumes:
       - ./.database/postgres/data:/var/lib/postgresql/data
     environment:
       - POSTGRES_PASSWORD=qwerty
+      - POSTGRES_USER=postgres
+    networks:
+      todo-app.net:
     ports:
       - 5436:5432
+    healthcheck:
+      test: pg_isready -U postgres -d postgres
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  migrate:
+    image: migrate/migrate
+    networks:
+      todo-app.net:
+    links:
+      - todo-app-postgres
+    depends_on:
+      - todo-app-postgres
+    volumes:
+      - .:/migrations
+    command:
+      [ "-path", "./migrations", "-database",  "postgres://postgres:qwerty@database:5432/postgres?sslmode=disable", "up", "3" ]
+volumes:
+  pgdata:
+networks:
+  todo-app.net:
