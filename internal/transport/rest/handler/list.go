@@ -1,7 +1,7 @@
 package handler
 
 import (
-	"github.com/Talodoak/todo-app"
+	"github.com/Talodoak/todo-app/internal/models"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
@@ -13,7 +13,7 @@ func (h *Handler) createList(ctx *gin.Context) {
 		return
 	}
 
-	var input todo.TodoList
+	var input models.TodoList
 	if err := ctx.BindJSON(&input); err != nil {
 		newErrorResponse(ctx, http.StatusBadRequest, err.Error(), "Invalid data")
 		return
@@ -31,7 +31,7 @@ func (h *Handler) createList(ctx *gin.Context) {
 }
 
 type getAllListsResponse struct {
-	Data []todo.TodoList `json:"data"`
+	Data []models.TodoList `json:"data"`
 }
 
 func (h *Handler) getAllLists(ctx *gin.Context) {
@@ -87,7 +87,7 @@ func (h *Handler) updateList(ctx *gin.Context) {
 		return
 	}
 
-	var input todo.UpdateListInput
+	var input models.UpdateListInput
 	if err := ctx.BindJSON(&input); err != nil {
 		newErrorResponse(ctx, http.StatusBadRequest, err.Error(), "List not updated")
 		return

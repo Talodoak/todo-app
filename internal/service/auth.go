@@ -4,8 +4,8 @@ import (
 	"crypto/sha1"
 	"errors"
 	"fmt"
-	"github.com/Talodoak/todo-app"
-	"github.com/Talodoak/todo-app/pkg/repository"
+	"github.com/Talodoak/todo-app/internal/models"
+	"github.com/Talodoak/todo-app/internal/storage"
 	"github.com/dgrijalva/jwt-go"
 	"time"
 )
@@ -17,7 +17,7 @@ const (
 )
 
 type AuthService struct {
-	repo repository.Authorization
+	repo storage.Authorization
 }
 
 type tokenClaims struct {
@@ -25,11 +25,11 @@ type tokenClaims struct {
 	UserId int `json:"user_id"`
 }
 
-func NewAuthService(repo repository.Authorization) *AuthService {
+func NewAuthService(repo storage.Authorization) *AuthService {
 	return &AuthService{repo: repo}
 }
 
-func (s *AuthService) CreateUser(user todo.User) (int, error) {
+func (s *AuthService) CreateUser(user models.User) (int, error) {
 	user.Password = generatePasswordHash(user.Password)
 	return s.repo.CreateUser(user)
 }

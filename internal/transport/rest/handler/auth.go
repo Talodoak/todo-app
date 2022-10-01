@@ -1,7 +1,7 @@
 package handler
 
 import (
-	"github.com/Talodoak/todo-app"
+	"github.com/Talodoak/todo-app/internal/models"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -31,7 +31,7 @@ func (h *Handler) signIn(ctx *gin.Context) {
 }
 
 func (h *Handler) signUp(ctx *gin.Context) {
-	var input todo.User
+	var input models.User
 
 	if err := ctx.BindJSON(&input); err != nil {
 		newErrorResponse(ctx, http.StatusBadRequest, err.Error(), "Invalid user")

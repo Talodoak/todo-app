@@ -2,7 +2,7 @@ package postgres
 
 import (
 	"fmt"
-	"github.com/Talodoak/todo-app"
+	"github.com/Talodoak/todo-app/internal/models"
 	"github.com/jmoiron/sqlx"
 	"github.com/spf13/viper"
 )
@@ -15,7 +15,7 @@ func NewAuthPostgres(db *sqlx.DB) *AuthPostgres {
 	return &AuthPostgres{db: db}
 }
 
-func (r *AuthPostgres) CreateUser(user todo.User) (int, error) {
+func (r *AuthPostgres) CreateUser(user models.User) (int, error) {
 	var id int
 
 	query := fmt.Sprintf(`INSERT INTO %s (name, username, password_hash) values ($1, $2, $3) RETURNING id`, viper.GetString("postgres.usersTable"))
@@ -28,8 +28,8 @@ func (r *AuthPostgres) CreateUser(user todo.User) (int, error) {
 	return id, nil
 }
 
-func (r *AuthPostgres) GetUser(username, password string) (todo.User, error) {
-	var user todo.User
+func (r *AuthPostgres) GetUser(username, password string) (models.User, error) {
+	var user models.User
 
 	query := fmt.Sprintf(` 
 	SELECT id 

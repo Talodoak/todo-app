@@ -1,7 +1,7 @@
 package handler
 
 import (
-	"github.com/Talodoak/todo-app/pkg/service"
+	"github.com/Talodoak/todo-app/internal/service"
 	"github.com/gin-gonic/gin"
 )
 
