@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   todo-app:
-    build: ./
+    build: ..
     command: ./scripts/wait-for-postgres.sh todo-app-postgres ./todo-app
     ports:
       - 8000:8000
@@ -11,21 +11,26 @@ services:
     networks:
       todo-app.net:
     environment:
-      - DB_PASSWORD=qwerty
+      - POSTGRES_USERNAME=postgres
+      - POSTGRES_PASSWORD=qwerty
+      - POSTGRES_HOST=todo-app-postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_SSL_MODE=disable
+      - POSTGRES_DATABASENAME=postgres
 
   todo-app-postgres:
     hostname: todo-app-postgres
     restart: always
     image: postgres:latest
     volumes:
-      - ./.database/postgres/data:/var/lib/postgresql/data
+      - pg_data:/var/lib/postgresql/data
     environment:
       - POSTGRES_PASSWORD=qwerty
       - POSTGRES_USER=postgres
     networks:
       todo-app.net:
     ports:
-      - 5436:5432
+      - "5436:5432"
     healthcheck:
       test: pg_isready -U postgres -d postgres
       interval: 10s
@@ -44,7 +49,21 @@ services:
       - .:/migrations
     command:
       [ "-path", "./migrations", "-database",  "postgres://postgres:qwerty@database:5432/postgres?sslmode=disable", "up", "3" ]
+
+  nginx:
+    image: nginx
+    depends_on:
+      - todo-app
+    ports:
+      - "80:80"
+    networks:
+      todo-app.net:
+    volumes:
+      - static_data:/var/www/html/static
+      - ./nginx-conf.d:etc/nginx/conf.d
+
 volumes:
-  pgdata:
+  pg_data:
+  static_data:
 networks:
   todo-app.net:

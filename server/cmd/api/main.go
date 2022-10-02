@@ -1,34 +1,47 @@
 package main
 
 import (
+	"context"
 	"github.com/Talodoak/todo-app/internal/service"
 	repository2 "github.com/Talodoak/todo-app/internal/storage"
 	"github.com/Talodoak/todo-app/internal/storage/postgres"
 	"github.com/Talodoak/todo-app/internal/transport/rest"
 	"github.com/Talodoak/todo-app/internal/transport/rest/handler"
+	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
-
-	"context"
 	"os"
 	"os/signal"
 	"syscall"
 )
 
+func goDotEnvVariable(key string) string {
+	err := godotenv.Load(".env")
+
+	if err != nil {
+		logrus.Error("Error loading .env file", err)
+	}
+
+	return os.Getenv(key)
+}
+
 func main() {
+	gin.SetMode(gin.ReleaseMode)
+
 	logrus.SetFormatter(new(logrus.JSONFormatter))
 	if err := initConfig(); err != nil {
 		logrus.Fatalf("error initializing configs: %s", err)
 	}
 
 	db, err := postgres.NewPostgresDB(postgres.Config{
-		Host:     viper.GetString("db.host"),
-		Port:     viper.GetString("db.port"),
-		Username: viper.GetString("db.username"),
-		DBName:   viper.GetString("db.dbname"),
-		SSLMode:  viper.GetString("db.sslmode"),
-		Password: os.Getenv("DB_PASSWORD"),
+		Host:     goDotEnvVariable("POSTGRES_HOST"),
+		Port:     goDotEnvVariable("POSTGRES_PORT"),
+		Username: goDotEnvVariable("POSTGRES_USERNAME"),
+		DBName:   goDotEnvVariable("POSTGRES_DATABASENAME"),
+		SSLMode:  goDotEnvVariable("POSTGRES_SSL_MODE"),
+		Password: goDotEnvVariable("POSTGRES_PASSWORD"),
 	})
 	if err != nil {
 		logrus.Fatalf("failed to initialize db: %s", err.Error())
@@ -40,12 +53,12 @@ func main() {
 
 	server := new(rest.Server)
 	go func() {
-		if err := server.Run(viper.GetString("port"), handlers.InitRoutes()); err != nil {
-			logrus.Fatalf("error occured while running http server: %s", err.Error())
+		if servErr := server.Run(goDotEnvVariable("APP_PORT"), handlers.InitRoutes()); servErr != nil {
+			logrus.Fatalf("error occured while running http server: %s", servErr.Error())
 		}
 	}()
 
-	logrus.Print("TodoApp Started")
+	logrus.Printf("TodoApp Started at port %s", goDotEnvVariable("APP_PORT"))
 
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, syscall.SIGTERM, syscall.SIGINT)

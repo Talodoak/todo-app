@@ -3,7 +3,11 @@ FROM golang
 RUN go version
 ENV GOPATH=/
 
-COPY ./ ./
+
+
+COPY .. ./
+
+RUN cp ./.env.example ./.env
 
 # install psql
 RUN apt-get update
