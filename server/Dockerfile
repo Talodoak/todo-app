@@ -3,8 +3,6 @@ FROM golang
 RUN go version
 ENV GOPATH=/
 
-
-
 COPY .. ./
 
 RUN cp ./.env.example ./.env

@@ -2,21 +2,21 @@ version: '3.8'
 
 services:
   todo-app:
-    build: ..
+    image: todo-app
     command: ./scripts/wait-for-postgres.sh todo-app-postgres ./todo-app
     ports:
-      - 8000:8000
+      - "8000:8000"
     depends_on:
       - todo-app-postgres
     networks:
       todo-app.net:
     environment:
-      - POSTGRES_USERNAME=postgres
-      - POSTGRES_PASSWORD=qwerty
-      - POSTGRES_HOST=todo-app-postgres
-      - POSTGRES_PORT=5432
-      - POSTGRES_SSL_MODE=disable
-      - POSTGRES_DATABASENAME=postgres
+      - PG_HOST=todo-app-postgres
+      - PG_DATABASENAME=postgres
+      - PR_USERNAME=postgres
+      - PG_PASSWORD=qwerty
+      - PG_PORT=5432
+      - PG_SSL_MODE=disable
 
   todo-app-postgres:
     hostname: todo-app-postgres
@@ -26,44 +26,26 @@ services:
       - pg_data:/var/lib/postgresql/data
     environment:
       - POSTGRES_PASSWORD=qwerty
-      - POSTGRES_USER=postgres
-    networks:
-      todo-app.net:
     ports:
       - "5436:5432"
-    healthcheck:
-      test: pg_isready -U postgres -d postgres
-      interval: 10s
-      timeout: 3s
-      retries: 5
-
-  migrate:
-    image: migrate/migrate
     networks:
       todo-app.net:
-    links:
-      - todo-app-postgres
-    depends_on:
-      - todo-app-postgres
-    volumes:
-      - .:/migrations
-    command:
-      [ "-path", "./migrations", "-database",  "postgres://postgres:qwerty@database:5432/postgres?sslmode=disable", "up", "3" ]
 
-  nginx:
-    image: nginx
-    depends_on:
-      - todo-app
-    ports:
-      - "80:80"
-    networks:
-      todo-app.net:
-    volumes:
-      - static_data:/var/www/html/static
-      - ./nginx-conf.d:etc/nginx/conf.d
+
+#  migrate:
+#    image: migrate/migrate
+#    networks:
+#      todo-app.net:
+#    links:
+#      - todo-app-postgres
+#    depends_on:
+#      - todo-app-postgres
+#    volumes:
+#      - .:/migrations
+#    command:
+#      [ "-path", "./migrations", "-database",  "postgres://postgres:qwerty@database:5432/postgres?sslmode=disable", "up", "3" ]
 
 volumes:
   pg_data:
-  static_data:
 networks:
   todo-app.net:

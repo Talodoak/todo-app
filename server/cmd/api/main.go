@@ -36,12 +36,12 @@ func main() {
 	}
 
 	db, err := postgres.NewPostgresDB(postgres.Config{
-		Host:     goDotEnvVariable("POSTGRES_HOST"),
-		Port:     goDotEnvVariable("POSTGRES_PORT"),
-		Username: goDotEnvVariable("POSTGRES_USERNAME"),
-		DBName:   goDotEnvVariable("POSTGRES_DATABASENAME"),
-		SSLMode:  goDotEnvVariable("POSTGRES_SSL_MODE"),
-		Password: goDotEnvVariable("POSTGRES_PASSWORD"),
+		Host:     goDotEnvVariable("PG_HOST"),
+		Port:     goDotEnvVariable("PG_PORT"),
+		Username: goDotEnvVariable("PG_USERNAME"),
+		DBName:   goDotEnvVariable("PG_DATABASENAME"),
+		SSLMode:  goDotEnvVariable("PG_SSL_MODE"),
+		Password: goDotEnvVariable("PG_PASSWORD"),
 	})
 	if err != nil {
 		logrus.Fatalf("failed to initialize db: %s", err.Error())
